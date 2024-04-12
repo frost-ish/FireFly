@@ -13,3 +13,6 @@ function runApp(client){
         console.log(`Server is running on port ${port}`);
     });
 }
+
+const UserRoutes = require("./routes/user");
+app.use("/user", UserRoutes);
