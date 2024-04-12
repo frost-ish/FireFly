@@ -2,6 +2,18 @@ const mongoose = require("mongoose");
 const Building = require("../models/building");
 const Response = require("../utils/response");
 
+const coordinates = {
+    "3 0":"77.18556315921688,28.624211110729064",
+    "3 1":"77.1858402008753,28.624575834283945",
+    "3 2":"77.18609833293488,28.62492572463931",
+    "3 3":"77.18633689271303,28.625217541152722",
+    "3 4":"77.18652913663016,28.62548036372624",
+    "3 5":"77.1866817184823,28.625679058835132",
+    "3 6":"77.18808444587967,28.623919936863828",
+    "2 6":"77.18649614979381,28.625966455141977",
+    "1 6":"77.18617795049335,28.62615480668582",
+    "0 6":"77.18595579555301,28.62631074601461"
+}
 
 const navigateToFireExit = async (req, res) => {
     if(req.query == null || req.query.x == null || req.query.y == null) {
@@ -36,14 +48,7 @@ const navigateToFireExit = async (req, res) => {
     if(path) {
         Response.sendSuccessMessage(res, "Path found", {
         time: time, 
-        path: path,
-        topLeftLat: building.topLeft.coordinates[1],
-        topRightLat: building.topRight.coordinates[1],
-        topLeftLong: building.topLeft.coordinates[0],
-        bottomLeftLong: building.bottomLeft.coordinates[0],
-        bottomLeftLat: building.bottomLeft.coordinates[1],
-        totalDivX: building.totalDivX,
-        totalDivY: building.totalDivY
+        path: path
     });
     }
     else {
@@ -188,7 +193,9 @@ function printPath(parentX, parentY, x, y) {
   
     const path = [];
     while (x !== -1 && y !== -1) {
-      path.push({ x, y });
+      const str = x + " " + y;
+      const latlng = coordinates[str];
+      path.push([latlng.split(",")[1], latlng.split(",")[0]]);
       const tempX = parentX[x][y];
       const tempY = parentY[x][y];
       x = tempX;
