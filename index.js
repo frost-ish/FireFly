@@ -25,3 +25,6 @@ app.use("/sensor", SensorRoutes);
 
 const EventRoutes = require("./routes/event");  
 app.use("/event", EventRoutes);
+
+const UcsRoutes = require("./routes/ucs");
+app.use("/ucs", UcsRoutes)
