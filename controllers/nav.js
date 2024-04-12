@@ -4,12 +4,12 @@ const Response = require("../utils/response");
 
 
 const navigateToFireExit = async (req, res) => {
-    if(req.query == null || req.query.building_id == null || req.query.lat == null || req.query.long == null) {
+    if(req.query == null || req.query.building_id == null) {
         Response.sendErrorMessage(res, 400, "Missing parameters");
         return;
     }
 
-    const {building_id, lat, long} = req.query;
+    const {building_id} = req.query;
     const building = await Building.findById(building_id);
     if(!building) {
         Response.sendErrorMessage(res, 400, "Building not found");
@@ -19,7 +19,6 @@ const navigateToFireExit = async (req, res) => {
     const map = building.map;
     const fire = building.fire;
     const goalNodes = [ [6,23] , [13,21] , [13,22] , [9,4] , [0,6] ]
-
     const rowCount = map.length;
     const colCount = map[0].length;
     const parentX = [];
@@ -34,7 +33,15 @@ const navigateToFireExit = async (req, res) => {
 
     const [time, goalX, goalY] = bfs(map, visited, fire, 3, 0, goalNodes, parentX, parentY);
     const path = printPath(parentX, parentY, goalX, goalY);
-    res.send(path);
+    if(path) {
+        Response.sendSuccessMessage(res, "Path found", {
+        time: time, 
+        path: path
+    });
+    }
+    else {
+        Response.sendErrorMessage(res, 404, "No path found");
+    }
 }
 
 function isValidCell(map, x, y) {
@@ -55,6 +62,62 @@ function is_GoalNode(coordinate, coordinatesArray) {
     return false;
 }
 
+const ttiMatrix = 
+[
+    [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250],
+    [200, 300, 400, 500, 600, 700, 800, 900, 1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200],
+    [300, 400, 500, 600, 700, 800, 900, 1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150],
+    [400, 500, 600, 700, 800, 900, 1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100],
+    [500, 600, 700, 800, 900, 1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50],
+    [600, 700, 800, 900, 1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50, 30],
+    [700, 800, 900, 1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50, 30, 20],
+    [800, 900, 1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50, 30, 20, 50],
+    [900, 1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50, 30, 20, 50, 100],
+    [1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50, 30, 20, 50, 100, 150],
+    [950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50, 30, 20, 50, 100, 150, 200],
+    [900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50, 30, 20, 50, 100, 150, 200, 250],
+    [850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50, 30, 20, 50, 100, 150, 200, 250, 300],
+    [800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50, 30, 20, 50, 100, 150, 200, 250, 300, 350]
+  ]
+
+function simulateFireSpread(map, fire, time, ttiMatrix) {
+    const directions = [
+        { dx: -1, dy: 0 }, { dx: 1, dy: 0 },
+        { dx: 0, dy: -1 }, { dx: 0, dy: 1 }
+    ];
+    const calculateSpreadProbability = (tti) => {
+        return Math.max(0.01, Math.min(1.0, 1 / tti));
+    };
+    let t = 0;
+        while (t<time) {
+            let avg_tti = 0;
+            let steps = 0;
+            const newFire = fire.map(row => [...row]);
+            for (let x = 0; x < map.length; x++) {
+            for (let y = 0; y < map[0].length; y++) {
+                if (fire[x][y]) { // Already on fire
+                continue;
+                }
+                let fireNearby = directions.some(({dx, dy}) => {
+                const nx = x + dx, ny = y + dy;
+                return nx >= 0 && nx < map.length && ny >= 0 && ny < map[0].length && fire[nx][ny];
+                });
+                if (fireNearby) {
+                let spreadProbability = calculateSpreadProbability(ttiMatrix[x][y]);
+                avg_tti += spreadProbability;
+                steps += 1;
+                if (Math.random() < spreadProbability) {
+                    newFire[x][y] = true;
+                }
+                }
+            }
+            }
+            fire = newFire;
+            t += avg_tti/steps;
+        }
+    return fire;
+    }
+
 function bfs(map, visited, fire, x1, y1, goalNodes, parentX, parentY) {
     const queue = [];
     queue.push([x1, y1]);
@@ -67,7 +130,6 @@ function bfs(map, visited, fire, x1, y1, goalNodes, parentX, parentY) {
       let found = false;
       for (let i = 0; i < n; i++) {
         const [x, y] = queue.shift();
-        console.log("visiting node: "+x+" "+y);
         if (!isNodeSafe(map, fire, x, y, time)) continue;
         if (is_GoalNode([x, y], goalNodes)) {
           found = true;
@@ -102,11 +164,16 @@ function bfs(map, visited, fire, x1, y1, goalNodes, parentX, parentY) {
       }
       if (found) break;
       time++;
+      fire = simulateFireSpread(map, fire, 1, ttiMatrix);
     }
     return [time, goalX, goalY];
 }
 
 function printPath(parentX, parentY, x, y) {
+    if(x==null||y==null) {
+        console.log("No path found");
+      return;
+    }
     if (parentX[x][y] === -1 && parentY[x][y] === -1) {
       console.log("No path found");
       return;

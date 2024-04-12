@@ -5,18 +5,7 @@ const sensorSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Building"
     },
-    onfire: Boolean,
-    coordinates: {
-        type: {
-          type: String,
-          enum: ['Point'], 
-          required: true
-        },
-        coordinates: {
-          type: [Number],
-          required: true
-        }
-    },
+    onFire: Boolean,
     x : Number,
     y : Number
 });

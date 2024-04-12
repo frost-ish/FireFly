@@ -5,7 +5,11 @@ const Response = require("../utils/response")
 const updateSensorData = async (req, res) => {
     try {
         const {onFire} = req.body;
-        const sensor = await Sensor.findByIdAndUpdate(req.params.id, {onFire}, {new:true});
+        if(!onFire) {
+            Response.sendSuccessMessage(res, "Sensor status updated successfully");
+            return;
+        }
+        const sensor = await Sensor.findByIdAndUpdate(req.body.id, {onFire}, {new:true});
         Response.sendSuccessMessage(res, "Sensor status updated successfully", sensor);
     } catch(error) {
         Response.sendErrorMessage(res, 400, error);
@@ -13,16 +17,15 @@ const updateSensorData = async (req, res) => {
 }
 
 const createSensor = async (req, res) => {
-    console.log(req.body)
-    if(!req.body || !req.body.building_id|| req.body.onFire==null || !req.body.lat || !req.body.long) {
+    if(!req.body || !req.body.building_id|| req.body.onFire==null || req.body.x==null || req.body.y==null) {
         Response.sendErrorMessage(res, 400, "Missing parameters");
         return;
     }
-    const location = {type: "Point", coordinates: [req.body.long, req.body.lat]};
     const sensor = await Sensor.create({
-        building_d: req.body.building_d,
+        building_id: req.body.building_id,
         onFire: req.body.onFire,
-        coordinates: location
+        x: req.body.x,
+        y: req.body.y
     });
     Response.sendSuccessMessage(res, "Sensor created successfully", sensor); 
 }
