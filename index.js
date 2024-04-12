@@ -28,3 +28,6 @@ app.use("/event", EventRoutes);
 
 const UcsRoutes = require("./routes/ucs");
 app.use("/ucs", UcsRoutes)
+
+const navRoutes = require("./routes/nav");
+app.use("/nav", navRoutes);

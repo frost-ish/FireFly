@@ -15,6 +15,50 @@ const buildingSchema = new mongoose.Schema({
           required: true
         }
     },
+    topLeft: {
+        type: {
+          type: String,
+          enum: ['Point'], 
+          required: true
+        },
+        coordinates: {
+          type: [Number],
+          required: true
+        }
+    },
+    topRight: {
+        type: {
+          type: String,
+          enum: ['Point'], 
+          required: true
+        },
+        coordinates: {
+          type: [Number],
+          required: true
+        }
+    },
+    bottomLeft: {
+        type: {
+          type: String,
+          enum: ['Point'], 
+          required: true
+        },
+        coordinates: {
+          type: [Number],
+          required: true
+        }
+    },
+    bottomRight: {
+        type: {
+          type: String,
+          enum: ['Point'], 
+          required: true
+        },
+        coordinates: {
+          type: [Number],
+          required: true
+        }
+    },
     map: [[[Number]]],
     fire: [[Number]]
 })

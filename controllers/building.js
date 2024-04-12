@@ -8,12 +8,20 @@ const createNewBuilding = async (req,res) => {
     }
     try{
         const location = {type: "Point", coordinates: [req.body.long, req.body.lat]}
+        const topLeft = {type: "Point", coordinates: [req.body.topLeft[0], req.body.topLeft[1]]}
+        const bottomLeft = {type: "Point", coordinates: [req.body.bottomLeft[0], req.body.bottomLeft[1]]}
+        const topRight = {type: "Point", coordinates: [req.body.topRight[0], req.body.topRight[1]]}
+        const bottomRight = {type: "Point", coordinates: [req.body.bottomRight[0], req.body.bottomRight[1]]}
         const building = await Building.create({
             name: req.body.name,
             address: req.body.address,
             location: location,
             map: req.body.map,
-            fire: req.body.fire
+            fire: req.body.fire,
+            topLeft: topLeft,
+            topRight: topRight,
+            bottomLeft: bottomLeft,
+            bottomRight: bottomRight
         })
         Response.sendSuccessMessage(res, "Building created successfully", building)
     } catch(error) {
