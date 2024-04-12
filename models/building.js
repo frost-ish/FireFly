@@ -60,7 +60,9 @@ const buildingSchema = new mongoose.Schema({
         }
     },
     map: [[[Number]]],
-    fire: [[Number]]
+    fire: [[Number]],
+    totalDivX: Number,
+    totalDivY: Number
 })
 
 const Building = mongoose.model("Building", buildingSchema)

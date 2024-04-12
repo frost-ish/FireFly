@@ -4,18 +4,18 @@ const Response = require("../utils/response");
 
 
 const navigateToFireExit = async (req, res) => {
-    if(req.query == null || req.query.building_id == null) {
+    if(req.query == null || req.query.x == null || req.query.y == null) {
         Response.sendErrorMessage(res, 400, "Missing parameters");
         return;
     }
 
-    const {building_id} = req.query;
+    const building_id = "66194a5983fa9e2aa31f8c90";
     const building = await Building.findById(building_id);
     if(!building) {
         Response.sendErrorMessage(res, 400, "Building not found");
         return;
     }
-
+    
     const map = building.map;
     const fire = building.fire;
     const goalNodes = [ [6,23] , [13,21] , [13,22] , [9,4] , [0,6] ]
@@ -31,12 +31,16 @@ const navigateToFireExit = async (req, res) => {
     const visited = new Array(rowCount).fill(null).map(() => new Array(colCount).fill(false));
 
 
-    const [time, goalX, goalY] = bfs(map, visited, fire, 3, 0, goalNodes, parentX, parentY);
+    const [time, goalX, goalY] = bfs(map, visited, fire, parseInt(req.query.x), parseInt(req.query.y), goalNodes, parentX, parentY);
     const path = printPath(parentX, parentY, goalX, goalY);
     if(path) {
         Response.sendSuccessMessage(res, "Path found", {
         time: time, 
-        path: path
+        path: path,
+        topLeftLat: building.topLeft.coordinates[1],
+        topRightLat: building.topRight.coordinates[1],
+        topLeftLong: building.topLeft.coordinates[0],
+        bottomLeftLong: building.bottomLeft.coordinates[0]
     });
     }
     else {
