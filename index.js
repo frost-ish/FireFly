@@ -16,3 +16,12 @@ function runApp(client){
 
 const UserRoutes = require("./routes/user");
 app.use("/user", UserRoutes);
+
+const BuildingRoutes = require("./routes/building");
+app.use("/building", BuildingRoutes); 
+
+const SensorRoutes = require("./routes/sensor");
+app.use("/sensor", SensorRoutes);
+
+const EventRoutes = require("./routes/event");  
+app.use("/event", EventRoutes);
