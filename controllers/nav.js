@@ -40,7 +40,9 @@ const navigateToFireExit = async (req, res) => {
         topLeftLat: building.topLeft.coordinates[1],
         topRightLat: building.topRight.coordinates[1],
         topLeftLong: building.topLeft.coordinates[0],
-        bottomLeftLong: building.bottomLeft.coordinates[0]
+        bottomLeftLong: building.bottomLeft.coordinates[0],
+        totalDivX: building.totalDivX,
+        totalDivY: building.totalDivY
     });
     }
     else {
