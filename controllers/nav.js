@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Building = require("../models/building");
 const Response = require("../utils/response");
+const Sensor = require("../models/sensor")
 
 const coordinates = {
     "3 0":"77.18556315921688,28.624211110729064",
@@ -31,7 +32,7 @@ const getLatLng = async (req, res) => {
     const sensor = await Sensor.findOne({uuid: req.query.uuid});
     
     const entry = coordinates[sensor.x + " " + sensor.y];
-    Response.sendSuccessMessage(res, "Coordinates found",s {lat: entry.split(",")[1], lng: entry.split(",")[0]});
+    Response.sendSuccessMessage(res, "Coordinates found", {lat: entry.split(",")[1], lng: entry.split(",")[0]});
 }
 
 const navigateToFireExit = async (req, res) => {
