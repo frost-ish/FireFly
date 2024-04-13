@@ -17,7 +17,7 @@ const createEvent = async (req, res) => {
             await notifyPeopleInBuilding(building_id, event._id)
         }
         if(assignFirefighter) {
-            await assignFirefighterToBuilding(building_id, event)
+            // await assignFirefighterToBuilding(building_id, event)
         }
         Response.sendSuccessMessage(res, "Event created successfully", event)
     } catch (error) {
@@ -108,10 +108,12 @@ const notifyPeopleInBuilding = async (building_id, event_id) => {
           const body = {
             "to": users[i].fcmKey,
             "data": {
-                "latlng": building.location,
-                "peronStranded": personStranded._id
+                "lat": building.location.coordinates[1],
+                "lng":building.location.coordinates[0],
+                "personStranded": personStranded._id
             }
           };
+          console.log(building.location);
 
           const options = {
             method: 'POST',
@@ -121,6 +123,7 @@ const notifyPeopleInBuilding = async (building_id, event_id) => {
             },
             body: JSON.stringify(body)
           };
+          console.log(users[i].fcmKey)
           
           fetch('https://fcm.googleapis.com/fcm/send', options, 20000)
             .then(response => response.json())

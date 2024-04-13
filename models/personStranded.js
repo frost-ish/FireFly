@@ -21,6 +21,6 @@ const personStrandedSchema = new mongoose.Schema({
     }
 })
 
-const PeopleStranded = mongoose.model("PersonStranded", personStrandedSchema)
+const PersonStranded = mongoose.model("PersonStranded", personStrandedSchema)
 
-module.exports = PeopleStranded
+module.exports = PersonStranded

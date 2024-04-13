@@ -1,4 +1,4 @@
-const PersonStranded = require("../models/person_stranded")
+const PersonStranded = require("../models/personStranded")
 const Response = require("../utils/response")
 const mongoose = require("mongoose")
 

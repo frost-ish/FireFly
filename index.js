@@ -31,3 +31,6 @@ app.use("/ucs", UcsRoutes)
 
 const navRoutes = require("./routes/nav");
 app.use("/nav", navRoutes);
+
+const personStrandedRoutes = require("./routes/personStranded");
+app.use("/personStranded",personStrandedRoutes);

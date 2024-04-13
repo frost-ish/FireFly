@@ -28,6 +28,8 @@ const updateSensorData = async (req, res) => {
         if(!isOnFire) {
             // New fire in the building
             const event = await Event.createEventInternal(sensor.building_id, true, true);
+            sensor.onFire = onFire;
+            sensor.save
         } else {
             // Existing fire spreading
         }
