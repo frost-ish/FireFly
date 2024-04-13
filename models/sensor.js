@@ -7,7 +7,8 @@ const sensorSchema = new mongoose.Schema({
     },
     onFire: Boolean,
     x : Number,
-    y : Number
+    y : Number,
+    uuid: Number
 });
 
 const sensor = mongoose.model("Sensor", sensorSchema);

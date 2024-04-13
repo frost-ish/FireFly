@@ -12,7 +12,26 @@ const coordinates = {
     "3 6":"77.18808444587967,28.623919936863828",
     "2 6":"77.18649614979381,28.625966455141977",
     "1 6":"77.18617795049335,28.62615480668582",
-    "0 6":"77.18595579555301,28.62631074601461"
+    "0 6":"77.18595579555301,28.62631074601461",
+    "4 5":"77.1867894956078,28.625281068446697",
+    "5 5":"77.18702904039617,28.625145082549707",
+    "6 5":"77.18737315982241,28.62491711975656",
+    "7 5":"77.18768464576732,28.624711217432747",
+    "8 5":"77.18792475683966,28.6245517469888",
+    "9 5":"77.1881914864174,28.62441110552041",
+    "9 4":"77.18811617593661,28.624158110788414"
+}
+
+const getLatLng = async (req, res) => {
+    if(req.query.uuid == null) {
+        Response.sendErrorMessage(res, 400, "Missing parameters");
+        return;
+    }
+
+    const sensor = await Sensor.findOne({uuid: req.query.uuid});
+    
+    const entry = coordinates[sensor.x + " " + sensor.y];
+    Response.sendSuccessMessage(res, "Coordinates found",s {lat: entry.split(",")[1], lng: entry.split(",")[0]});
 }
 
 const navigateToFireExit = async (req, res) => {
@@ -206,4 +225,4 @@ function printPath(parentX, parentY, x, y) {
   }
   
 
-module.exports = {navigateToFireExit};
+module.exports = {navigateToFireExit, getLatLng};
